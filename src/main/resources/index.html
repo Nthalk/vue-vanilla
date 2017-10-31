@@ -1,0 +1,43 @@
+<html>
+<head>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="vendor/import-vue-component.js"></script>
+    <script>
+        importVueComponent.eager = false;
+        importVueComponent.track(function (state) {
+            console.log(state);
+        })
+    </script>
+</head>
+<body>
+<div class="app" @click="yeah = true">
+    <pre>
+&lt;script src="vendor/import-vue-component.js">&lt;/script>
+&lt;script>
+    // Wait for the render request before loading
+    importVueComponent.eager = false;
+    // Track
+    importVueComponent.track(function(state){
+        console.log(state) // loaded or loading
+    });
+    // Set prefixes for data loading
+    importVueComponent.basePath = '/my-path';
+&lt;/script>
+    </pre>
+    <pre>
+&lt;script>importVueComponent("some-component");&lt;/script>
+    </pre>
+    <heyo v-if="yeah"></heyo>
+</div>
+<script>
+    importVueComponent("heyo");
+    var app = new Vue({
+        el: ".app",
+        data: {
+            what: "Yeah",
+            yeah: false
+        }
+    });
+</script>
+</body>
+</html>
