@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.nthalk</groupId>
     <artifactId>vue-vanilla</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <url>http://nthalk.github.io/vue-vanilla/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,7 +52,7 @@
         <url>https://github.com/Nthalk/vue-vanilla</url>
         <connection>scm:git:git://github.com/Nthalk/vue-vanilla</connection>
         <developerConnection>scm:git:git@github.com:Nthalk/vue-vanilla</developerConnection>
-        <tag>vue-vanilla-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <developers>
         <developer>
