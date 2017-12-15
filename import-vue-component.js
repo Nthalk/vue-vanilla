@@ -1,3 +1,4 @@
+// MIT License Copyright (c) 2017 Carl Taylor
 var importVueComponent = (function () {
     var r = "importVueComponent requires ";
     if (!fetch) throw new Error(r + "fetch api polyfill (https://github.com/github/fetch)");
@@ -10,9 +11,9 @@ var importVueComponent = (function () {
     function statusReport() {
         for (var i = 0; i < statusListeners.length; i++) {
             if (active === 1) {
-                statusListeners[i]("loading");
+                statusListeners[i](true);
             } else if (active === 0) {
-                statusListeners[i]("loaded");
+                statusListeners[i](false);
             }
         }
     }
@@ -156,9 +157,8 @@ var importVueComponent = (function () {
     ivc.basePath = "";
 
     ivc.track = function (statusListener) {
-        if (active === 0) statusListener("loaded");
-        else statusListener("loading");
         statusListeners.push(statusListener);
+        statusListener(active !== 0);
     };
 
     return ivc;
