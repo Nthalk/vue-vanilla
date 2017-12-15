@@ -1,0 +1,21 @@
+<pre class="prettyprint">{{code}}</pre>
+<script>
+    window['code-snippet'] = {
+        require: {
+            PR: 'https://unpkg.com/code-prettify@0.1.0/src/prettify.js',
+            PR_CSS: 'https://unpkg.com/code-prettify@0.1.0/styles/desert.css'
+        },
+        then: function () {
+            return {
+                props: {
+                    code: String
+                },
+                mounted: function () {
+                    this.$nextTick(function () {
+                        PR.prettyPrint();
+                    })
+                }
+            }
+        }
+    }
+</script>
