@@ -54,18 +54,35 @@ var importVueComponent = (function () {
             for (var jsDepName in obj.require) {
                 if (obj.require.hasOwnProperty(jsDepName)) {
                     var depJsLocation = obj.require[jsDepName];
-                    if (window[depJsName]) {
-                        //console.log("already loaded", depJsName);
-                        promises.push(window[depJsName]);
-                    } else if (jsDepPromises[depJsName] !== void 0) {
-                        //console.log("reusing-loader", depJsName);
-                        promises.push(jsDepPromises[depJsName]);
+                    if (window[jsDepName]) {
+                        //console.log("already load ed", jsDepName);
+                        promises.push(window[jsDepName]);
+                    } else if (jsDepPromises[jsDepName] !== void 0) {
+                        //console.log("reusing-loader", jsDepName);
+                        promises.push(jsDepPromises[jsDepName]);
                     } else {
-                        //console.log("loading", depJsName);
-                        jsDepPromises[depJsName] = fetch(resolveLocation("lib", depJsLocation), {
-                            cache: 'default'
-                        });
-                        promises.push(jsDepPromises[depJsName]);
+                        //console.log("loading", jsDepName);
+                        jsDepPromises[jsDepName] = function (src) {
+                            return new Promise(function (resolve, reject) {
+                                if (src.lastIndexOf(".js") === src.length - 3) {
+                                    var script = document.createElement('script');
+                                    script.onload = resolve;
+                                    script.onerror = reject;
+                                    script.async = true;
+                                    script.src = src;
+                                    document.body.appendChild(script);
+                                } else {
+                                    var link = document.createElement('link');
+                                    link.rel = 'stylesheet';
+                                    link.type = 'text/css';
+                                    link.href = src;
+                                    link.media = 'all';
+                                    document.body.appendChild(link);
+                                    resolve();
+                                }
+                            });
+                        }(resolveLocation("lib", depJsLocation));
+                        promises.push(jsDepPromises[jsDepName]);
                     }
                 }
             }
@@ -73,10 +90,10 @@ var importVueComponent = (function () {
                 //console.log("finished loading deps for", name);
                 for (var jsDepName in obj.require) {
                     if (obj.require.hasOwnProperty(jsDepName)) {
-                        delete jsDepPromises[depJsName];
+                        delete jsDepPromises[jsDepName];
                     }
                 }
-                if (obj.then && obj.then.constructor instanceof Function) {
+                if (obj.then && obj.then.constructor === Function) {
                     finalize(resolve, obj.then(), template, name, jsName);
                 } else {
                     finalize(resolve, obj, template, name, jsName);
