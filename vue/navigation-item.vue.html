@@ -1,0 +1,25 @@
+<div class="navigation-item">
+    <h1>{{title}}</h1>
+    <slot></slot>
+</div>
+<script>
+    window['navigation-item'] = {
+        props: {
+            title: {
+                type: String,
+                required: true
+            }
+        },
+        computed: {
+            navigationItems: function () {
+                return this.$parent;
+            }
+        },
+        mounted: function () {
+            this.navigationItems.items.push(this);
+        },
+        beforeDestroy: function () {
+            this.navigationItems.items.splice(this.navigationItems.items.indexOf(this), 1);
+        }
+    }
+</script>

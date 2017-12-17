@@ -1,19 +1,54 @@
-<pre class="prettyprint">{{code}}</pre>
+<style>
+    .code-snippet {
+        padding: 10px;
+    }
+
+    .code-snippet * {
+        font-weight: normal !important;
+    }
+</style>
+<pre class="code-snippet prettyprint" v-html="content"></pre>
 <script>
     window['code-snippet'] = {
         require: {
-            PR: 'https://unpkg.com/code-prettify@0.1.0/src/prettify.js',
-            PR_CSS: 'https://unpkg.com/code-prettify@0.1.0/styles/desert.css'
+            PR: '//unpkg.com/code-prettify@0.1.0/src/prettify.js',
+            PR_CSS: '//unpkg.com/code-prettify@0.1.0/styles/desert.css'
         },
         then: function () {
             return {
                 props: {
                     code: String
                 },
-                mounted: function () {
-                    this.$nextTick(function () {
-                        PR.prettyPrint();
-                    })
+                computed: {
+                    content: function () {
+                        var content = "";
+                        var passedContent;
+                        if (this.$slots.default && this.$slots.default[0].text) {
+                            passedContent = this.$slots.default[0].text;
+                        } else {
+                            passedContent = this.code;
+                        }
+                        passedContent = passedContent.replace(/[&<"']/g, function (m) {
+                            switch (m) {
+                                case '&':
+                                    return '&amp;';
+                                case '<':
+                                    return '&lt;';
+                                case '"':
+                                    return '&quot;';
+                                default:
+                                    return '&#039;';
+                            }
+                        });
+                        var whiteSpaceOffset = null;
+                        passedContent.split("\n").slice(1).forEach(function (line) {
+                            if (whiteSpaceOffset === null) {
+                                whiteSpaceOffset = line.match("[^\\s]").index - 1;
+                            }
+                            content += line.substr(whiteSpaceOffset) + "\n";
+                        });
+                        return PR.prettyPrintOne(content);
+                    }
                 }
             }
         }

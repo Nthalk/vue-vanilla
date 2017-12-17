@@ -1,23 +1,22 @@
 <html>
 <head>
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Arvo|Source+Sans+Pro:400,400italic,700|Lato:300,400">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-    <script src="https://unpkg.com/vue@2.5.11/dist/vue.min.js"></script>
-
-    <script>if (!window.fetch) document.writeln('<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></' + 'script>');</script>
-    <script src="import-vue-component.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script>if (!window.fetch) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></' + 'script>');</script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.11/vue.min.js"></script>
+    <script src="import-vue-component.min.js"></script>
 
     <style>
         body {
+            margin: 0;
+            padding: 0;
             text-align: left;
             font-family: Arvo;
         }
 
         .logo {
             color: #41b882;
-            padding-left: 10em;
             padding-top: 5em;
-            padding-bottom: 5em;
         }
 
         .logo h1 {
@@ -28,51 +27,237 @@
             color: #35485d;
         }
 
+        .content {
+            margin-left: 200px;
+            margin-right: 200px;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="app">
+    <a href="https://github.com/nthalk/vue-vanilla"><img
+            style="position: absolute; top: 0; right: 0; border: 0;"
+            src="//camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67"
+            alt="Fork me on GitHub"
+            data-canonical-src="//s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+
     <loading-screen v-if="importerIsLoading"></loading-screen>
     <div v-else>
-        <div class="logo">
-            <h1>Vue Vanilla</h1>
-            <div class="logo_tagline">The micro, vanilla JavaScript component loader for Vue.js</div>
-            <div class="logo_buttons">
-                <a href="#download">Download</a>
-                <a href="#download">Example</a>
-            </div>
-        </div>
-        <code-snippet class="high-level-example" code="
-            var codesnippet = {
-                'what': 123
-            };
-        "></code-snippet>
         <div class="content">
-            <a href="https://github.com/nthalk/vue-vanilla"><img
-                    style="position: absolute; top: 0; right: 0; border: 0;"
-                    src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67"
-                    alt="Fork me on GitHub"
-                    data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
-            This is a small plain JavaScript component loader for Vue.js components. No node, no webpack, no
-            transpiling, no nonsense.
+            <div class="logo">
+                <h1>Vue Vanilla</h1>
+                <div class="logo_tagline">
+                    The micro, vanilla JavaScript component loader for Vue.js <br/>
+                    Size: 8.1k js, 3.2k min.js, 1.7k min.js.gz<br/>
+                    Dependencies: none
+                </div>
+            </div>
+
+            <navigation-items>
+                <navigation-item title="Application Usage">
+                    <code-snippet code="
+                        <div class='app'>
+                            <loading-screen></loading-screen>
+                            <input @click='showLoader'/>
+                        </div>
+                        <script>
+                            // HERE COMES THE SAUCE!
+                            importVueComponent('loading-screen'); // <-- tasty
+                            var app = new Vue({
+                                el: '.app',
+                                data: {
+                                    shouldShowLoader: false
+                                },
+                                methods: {
+                                    showLoader: function(){
+                                        this.shouldShowLoader = true;
+                                        setTimeout(function(){
+                                            this.shouldShowLoader = false;
+                                        }.bind(this), 1000);
+                                    }
+                                }
+                            });
+                        </script>
+                    "></code-snippet>
+                    <p>
+                        Using Vue Vanilla is simple. There is no requirejs, amd, commonjs requirement. No babbel,
+                        webpack,
+                        webpack2, browserify, or nodejs. It's just vanilla JavaScript.
+                    </p>
+                    <p>
+                        It is required to have a browser or polyfill for the Promises and fetch apis.
+                        As far as browser compatibilities go, ie9+ requires the fetch polyfill:
+                    </p>
+                    <code-snippet code="
+                        <script>
+                            if (!window.fetch) // thanks, IE...
+                                document.writeln('<script src=\'//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js\'></' +
+                                'script>');
+                        </script>
+                    "></code-snippet>
+                </navigation-item>
+
+
+                <navigation-item title="Component Definitions">
+                    <code-snippet code="
+                        <!--
+                            component's location: /vue/my-component.vue.html
+                            importing it in a vue app: importVueComponent('my-component');
+                        -->
+                        <style>
+                            .my-component{
+                                background: blue;
+                            }
+                        </style>
+                        <div class='my-component'>
+                            My content/template
+                        </div>
+                        <script>
+                            window['my-component'] = {/* normal Vue component definition */}
+                        </script>
+                    "></code-snippet>
+                    <p>
+                        Designing components is intended to be easy. All that's needed is a file with a script and a
+                        template.
+                    </p>
+                    <p>
+                        The script must define a window-level javascript name of the component.
+                    </p>
+                </navigation-item>
+
+                <navigation-item title="JS/CSS Requirements">
+                    <code-snippet code="
+                        ...
+                        <script>
+                            window['my-component'] = {
+                                require: {
+                                    'jQuery': '//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+                                    'bootstrap_css': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'
+                                },
+                                /* then: {... normal Vue component definition ...} */
+                                then: function(){
+                                    return {/* normal Vue component definition */};
+                                }
+                            }
+                        </script>
+                    "></code-snippet>
+                    <p>
+                        Sometimes, when you load a component, you need to be sure that you have all of the required
+                        libraries
+                        and css scripts loaded.
+                    </p>
+                    <p>
+                        By wrapping your component definition in an object with a require and then property, your
+                        component
+                        will try to load the scripts and styles first.
+                    </p>
+                    <p>
+                        Styles will not be loaded by the importer twice.
+                    </p>
+                    <p>
+                        If the key of the script, 'jQuery' in this case, is present, then it will not attempt to
+                        load
+                        it.
+                    </p>
+                    <p>
+                        If you are worried about version conflicts, then this library's opinion is that you are
+                        already
+                        dealing with too much dependency sprawl and should reduce your JavaScript usage.
+                    </p>
+                </navigation-item>
+
+                <navigation-item title="Configuration and locations">
+                    <p>
+                        By default, all resources are split up into two categories: lib and vue.
+                    </p>
+                    <p>
+                        Vue resources come from $basePath/vue/component-name.vue.html
+                    </p>
+                    <p>
+                        Lib resources come from $basePath/vendor/providedPath
+                    </p>
+                    <code-snippet code="
+                        // Default base path
+                        importVueComponent.location.basePath = '/some-other/context-path';
+
+                        //Vue compnent prefixes
+                        importVueComponent.location.prefixes['vue'] = 'some/other/vue/prefix';
+                        importVueComponent.location.suffixes['vue'] = '.vue';
+
+                        // Lib prefixes
+                        importVueComponent.location.prefixes['lib'] = 'some/other/lib/prefix';
+
+                        // Statically defined paths
+                        importVueComponent.location.overrides['jQuery'] = 'some/path/to/jquery.js';
+                    "></code-snippet>
+                    <p>
+                        However, you can specify other locations for your component if you want to be more organized
+                        or if your component has a conflicting js object name:
+                    </p>
+                    <code-snippet code="
+                        importVueComponent('my-component', 'some-location/my-component.vue', 'resolveAsGlobalJsName');
+                    "></code-snippet>
+                </navigation-item>
+
+                <navigation-item title="Loading, Loading screens, and eagerness">
+                    <p>
+                        Often, you want to show a loading screen while the components are being remotely loaded.
+                        To do this, you can add a listener to the importVueComponent:
+                    </p>
+                    <code-snippet code="
+                        var app = new Vue({
+                            el: '.app',
+                            data: {
+                                importerIsLoading: true
+                            },
+                            mounted: function () {
+                                importVueComponent.track(function (isLoading) {
+                                    this.importerIsLoading = isLoading
+                                }.bind(this));
+                            }
+                        });
+                    "></code-snippet>
+                    <p>
+                        Whenever the importVueComponent registers a component, it immediately tries to load it.
+                        This can be undesirable for large projects, or large routed applications, as it unnecessarily
+                        grabs resources and takes time. To turn this off, you can set the importVueComponent.eager flag
+                        to false:
+                    </p>
+                    <code-snippet code="
+                        importVueComponent.eager = false; // default is true
+                    "></code-snippet>
+                    <p>
+                        However, when doing so, it is recommended to track the loading state of the importer
+                        to tell when child components might be ready:
+                    </p>
+                    <code-snippet code="
+                        importVueComponent.onceLoaded(function(){
+                            // this will be run once importVueComponent is finished loading it's current set
+                            // $nextTick will fire after all child components have been mounted
+                        });
+                    "></code-snippet>
+                </navigation-item>
+            </navigation-items>
         </div>
     </div>
 </div>
 <script>
     // Create basic application
     importVueComponent("loading-screen");
+    importVueComponent("navigation-items");
+    importVueComponent("navigation-item");
     importVueComponent("code-snippet");
-    new Vue({
+    var app = new Vue({
         el: '.app',
         data: {
             importerIsLoading: true
         },
         mounted: function () {
-            var self = this;
             importVueComponent.track(function (isLoading) {
-                self.importerIsLoading = isLoading
-            });
+                this.importerIsLoading = isLoading
+            }.bind(this));
         }
     });
 </script>
