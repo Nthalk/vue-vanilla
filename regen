@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+rm -rf import-vue-component.min.js*
+uglifyjs import-vue-component.js \
+    --mangle \
+    --source-map "url='import-vue-component.min.js.map'" \
+    --comments "/MIT/" \
+    -o import-vue-component.min.js
+gzip --best --keep import-vue-component.min.js
+gzip --best --keep import-vue-component.min.js.map

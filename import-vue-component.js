@@ -1,44 +1,49 @@
 // MIT License Copyright (c) 2017 Carl Taylor
 var importVueComponent = (function () {
-    var rf;
-    if (!fetch) rf = "fetch api polyfill (https://github.com/github/fetch)";
-    if (!Promise) rf = "Promise api or polyfill (https://github.com/Ziriax/Promistix)";
-    if (!Vue) rf = "Vue (https://unpkg.com/vue)";
-    if (rf) throw new Error("importVueComponent requires " + rf);
+    var n = "importVueComponent ";
+    var e;
+    if (!fetch) e = "fetch api polyfill (https://github.com/github/fetch)";
+    if (!Promise) e = "Promise api or polyfill (https://github.com/Ziriax/Promistix)";
+    if (!Vue) e = "Vue (https://unpkg.com/vue)";
+    if (e) throw new Error(n + "requires " + e);
 
     var w = window;
     var d = document;
 
-    var active = 0;
-    var statusListeners = [];
-    var loadedCss = [];
-    var jsDepPromises = {};
+    // Active
+    var a = 0;
+    // Active Listeners
+    var l = [];
+    // Css Loaded
+    var c = [];
+    // Promises
+    var p = {};
 
-    function statusReport() {
-        var isActive = active === 1;
-        if (isActive || active === 0) for (var i = 0; i < statusListeners.length; i++) statusListeners[i](isActive);
+    function r() {
+        for (var i = 0; i < l.length; i++) l[i](a === 1);
     }
 
     function finalize(resolve, obj, template, name, jsName) {
         if (obj.processTemplate) template = obj.processTemplate(template);
-        if (!obj.name) obj.name = name;
+        obj.name = obj.name || name;
         obj.template = template;
-        //console.log("finalizing", name);
-        w[jsName] = obj;
-        resolve(obj);
+        resolve(w[jsName] = obj);
     }
 
     function ivc(name, location, jsName) {
-        location = location || name;
-        jsName = jsName || name;
-
-        // We may have already loaded this
-        if (w[jsName] && (w[jsName].constructor === Function || w[jsName].constructor === Object)) {
-            //console.log("Reusing loading definition", name);
-            return w[jsName];
+        var lazy = ivc.lazy;
+        if (location && location.constructor === Object) {
+            lazy = location.lazy ? location.lazy : lazy;
+            jsName = location.jsName || name;
+            location = location.location || name;
+        } else {
+            location = location || name;
+            jsName = jsName || name;
         }
 
-        // console.log("Loading definition", name);
+        // We may have already loaded this
+        if (w[jsName]) return w[jsName];
+
         var resolve, reject;
         var promise = new Promise(function (_resolve, _reject) {
             resolve = _resolve;
@@ -63,29 +68,25 @@ var importVueComponent = (function () {
                         obj = w[jsName];
                         w[jsName] = promise;
                     } else if (child.outerHTML) {
-                        if (template) throw new Error("Vue component " + name + " should wrap it's template in one element");
+                        if (template) throw new Error(n + name + " should wrap it's template in one element");
                         template = child.outerHTML;
                     }
                 }
 
-                if (!template) throw new Error("Vue component " + name + " should wrap it's template in one element");
-                if (!obj) throw new Error("loadVueComponent component" + jsName + " is not defined after loading component, did you forget to set the definition on the global scope? e.g. window['" + jsName + "'] = {}")
+                if (!template) throw new Error(n + name + " should wrap it's template in one element");
+                if (!obj) throw new Error(n + jsName + " is not defined after loading component, did you forget to set the definition on the global scope? e.g. window['" + jsName + "'] = {}")
 
                 if (obj.require) {
-                    //console.log("loading deps for", name);
                     var promises = [];
                     for (var jsDepName in obj.require) {
                         if (!obj.require.hasOwnProperty(jsDepName)) continue;
                         var depJsLocation = obj.require[jsDepName];
                         if (w[jsDepName]) {
-                            //console.log("already load ed", jsDepName);
                             promises.push(w[jsDepName]);
-                        } else if (jsDepPromises[jsDepName] !== void 0) {
-                            //console.log("reusing-loader", jsDepName);
-                            promises.push(jsDepPromises[jsDepName]);
+                        } else if (p[jsDepName]) {
+                            promises.push(p[jsDepName]);
                         } else {
-                            //console.log("loading", jsDepName);
-                            jsDepPromises[jsDepName] = function (src) {
+                            p[jsDepName] = function (src) {
                                 return new Promise(function (resolve, reject) {
                                     if (src.lastIndexOf(".js") === src.length - 3) {
                                         var script = d.createElement('script');
@@ -95,8 +96,8 @@ var importVueComponent = (function () {
                                         script.src = src;
                                         d.head.appendChild(script);
                                     } else {
-                                        if (loadedCss.indexOf(src) === -1) {
-                                            loadedCss.push(src);
+                                        if (c.indexOf(src) === -1) {
+                                            c.push(src);
                                             var link = d.createElement('link');
                                             link.rel = 'stylesheet';
                                             link.type = 'text/css';
@@ -109,12 +110,11 @@ var importVueComponent = (function () {
                                     }
                                 });
                             }(ivc.location(depJsLocation, "lib"));
-                            promises.push(jsDepPromises[jsDepName]);
+                            promises.push(p[jsDepName]);
                         }
                     }
                     Promise.all(promises).then(function () {
-                        //console.log("finished loading deps for", name);
-                        for (var jsDepName in obj.require) if (obj.require.hasOwnProperty(jsDepName)) delete jsDepPromises[jsDepName];
+                        for (var jsDepName in obj.require) delete p[jsDepName];
                         if (obj.then) obj = obj.then.constructor === Function ? obj.then() : obj.then;
                         finalize(resolve, obj, template, name, jsName);
                     });
@@ -124,14 +124,13 @@ var importVueComponent = (function () {
             });
         }
 
-        if (ivc.eager) retrieve();
+        if (!lazy) retrieve();
 
         Vue.component(name, w[jsName] = function (resolve) {
-            if (!ivc.eager) retrieve();
-            active++;
-            statusReport();
+            if (lazy) retrieve();
+            if (++a === 1) r();
             promise.then(resolve).then(function () {
-                if (--active === 0) statusReport();
+                if (--a === 0) r();
             });
         });
         return w[jsName];
@@ -140,44 +139,44 @@ var importVueComponent = (function () {
     /**
      * Define how to resolve a location given a type
      */
-    var r = ivc.location = function (location, type) {
-        if (!location || location.constructor !== String) throw new Error("Could not load:" + type + " resource at " + location);
-        if (r.overrides[location]) return r.overrides[location];
+    var L = ivc.location = function (location, type) {
+        if (!location || location.constructor !== String) throw new Error(n + "could not load:" + type + " resource at " + location);
+        if (L.overrides[location]) return r.overrides[location];
         if (location.indexOf("//") === 0 || location.indexOf("http") === 0) return location;
-        if (r.prefixes[type] !== void 0) location = r.prefixes[type] + location;
-        if (r.suffixes[type] !== void 0) location = location + r.suffixes[type];
+        if (L.prefixes[type]) location = L.prefixes[type] + location;
+        if (L.suffixes[type]) location = location + L.suffixes[type];
         if (location.indexOf("$basePath") === 0) {
-            if (r.basePath === void 0) throw new Error("loadVueComponent.basePath or contextPath is not set. Cannot determine where to load components from.");
-            location = r.basePath + location.substr("$basePath".length);
+            if (!L.basePath) throw new Error(n + " basePath is not set, Cannot determine components root");
+            location = L.basePath + location.substr("$basePath".length);
         }
         return location;
     };
-    r.overrides = {};
-    r.prefixes = {
+    L.overrides = {};
+    L.prefixes = {
         vue: "$basePath/vue/",
         lib: "$basePath/vendor/"
     };
-    r.suffixes = {
+    L.suffixes = {
         vue: ".vue.html"
     };
-    r.basePath = "";
+    L.basePath = "";
 
-    ivc.eager = false;
+    ivc.lazy = true;
 
-    ivc.track = function (statusListener) {
-        statusListeners.push(statusListener);
-        statusListener(active !== 0);
+    ivc.track = function (sl) {
+        l.push(sl);
+        sl(a !== 0);
     };
     ivc.onceLoaded = function (cb) {
-        if (active === 0) {
+        if (a === 0) {
             cb();
             return;
         }
         var a;
-        statusListeners.push(a = function (loaded) {
+        l.push(a = function (loaded) {
             if (!loaded) return;
             cb();
-            statusListeners.splice(statusListeners.indexOf(a), 1);
+            l.splice(l.indexOf(a), 1);
         })
     };
 

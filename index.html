@@ -1,8 +1,9 @@
 <html>
 <head>
     <script>if (!window.fetch) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></' + 'script>');</script>
+    <script>if (!window.Promise) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></' + 'script>');</script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.11/vue.min.js"></script>
-    <script src="import-vue-component.min.js"></script>
+    <script src="import-vue-component.js"></script>
     <script>
         importVueComponent.location.basePath = '/vue-vanilla';
     </script>
@@ -28,6 +29,7 @@
 
         .content {
             margin: auto;
+            padding: 10px;
         }
 
         /* Desktops and laptops ----------- */
@@ -56,7 +58,7 @@
                 <h1>Vue Vanilla</h1>
                 <div class="logo_tagline">
                     The micro, vanilla JavaScript component loader for Vue.js <br/>
-                    Size: 8.1k js, 3.2k min.js, 1.7k min.js.gz<br/>
+                    Size: 7.4k js, 3.9k min.js, 1.8k min.js.gz<br/>
                     Dependencies: none
                 </div>
             </div>
@@ -94,12 +96,17 @@
                     </p>
                     <p>
                         It is required to have a browser or polyfill for the Promises and fetch apis.
-                        As far as browser compatibilities go, ie9+ requires the fetch polyfill:
+                        As far as browser compatibilities go, ie9+ requires the fetch and promise polyfill:
                     </p>
                     <code-snippet code="
                         <script>
-                            if (!window.fetch) // thanks, IE...
-                                document.writeln('<script src=\'//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js\'></' +
+                            if (!window.fetch) document.writeln(
+                                '<script src=\'//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js\'></' +
+                                'script>');
+                        </script>
+                        <script>
+                            if (!window.Promise) document.writeln(
+                                '<script src='//cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js'></' +
                                 'script>');
                         </script>
                     "></code-snippet>
@@ -207,7 +214,7 @@
                     "></code-snippet>
                 </navigation-item>
 
-                <navigation-item title="Loading, Loading screens, and eagerness">
+                <navigation-item title="Loading, Loading screens, and lazyness">
                     <p>
                         Often, you want to show a loading screen while the components are being remotely loaded.
                         To do this, you can add a listener to the importVueComponent:
@@ -228,11 +235,11 @@
                     <p>
                         Whenever the importVueComponent registers a component, it immediately tries to load it.
                         This can be undesirable for large projects, or large routed applications, as it unnecessarily
-                        grabs resources and takes time. To turn this off, you can set the importVueComponent.eager flag
+                        grabs resources and takes time. To turn this off, you can set the importVueComponent.lazy flag
                         to false:
                     </p>
                     <code-snippet code="
-                        importVueComponent.eager = false; // default is true
+                        importVueComponent.lazy = true; // default is false
                     "></code-snippet>
                     <p>
                         However, when doing so, it is recommended to track the loading state of the importer
@@ -244,7 +251,23 @@
                             // $nextTick will fire after all child components have been mounted
                         });
                     "></code-snippet>
+
+                    <p>
+                        When using importVueComponent, you can specify to load some things lazily, the stub in place
+                        will
+                        either be the Component (when it's loaded) or a callback function:
+                    </p>
+
+                    <code-snippet code="
+                        new VueRouter({
+                          routes: [
+                            { path: '/user/:id', component: importVueComponent('user', {lazy: true})}
+                          ]
+                        })
+                    "></code-snippet>
+
                 </navigation-item>
+
             </navigation-items>
         </div>
     </div>
