@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-rm -rf import-vue-component.min.js*
-uglifyjs import-vue-component.js \
+VERSION=$(cat pom.xml | grep '<version' | cut -d'>' -f2 | cut -d'<' -f1 | head -n1)
+
+gsed --in-place 's/Version:.*/Version: '${VERSION}'/' dist/import-vue-component.js
+
+rm -rf dist/import-vue-component.min.js*
+uglifyjs dist/import-vue-component.js \
     --mangle \
     --source-map "url='import-vue-component.min.js.map'" \
-    --comments "/MIT/" \
-    -o import-vue-component.min.js
-gzip --best --keep import-vue-component.min.js
-gzip --best --keep import-vue-component.min.js.map
+    --comments "/MIT|Version/" \
+    -o dist/import-vue-component.min.js
