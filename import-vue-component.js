@@ -25,8 +25,20 @@ var importVueComponent = (function () {
 
     function finalize(resolve, obj, template, name, jsName) {
         if (obj.processTemplate) template = obj.processTemplate(template);
+        if (template) {
+            if (obj.functional) {
+                var fn = Vue.compile(template);
+                obj.render = function (instance, ctx) {
+                    return fn.render.call(ctx);
+                }
+            } else {
+                obj.template = template;
+            }
+        } else if (!obj.render) {
+            throw new Error(n + name + " should wrap it's template in one element");
+        }
         obj.name = obj.name || name;
-        obj.template = template;
+
         resolve(w[jsName] = obj);
     }
 
@@ -73,7 +85,6 @@ var importVueComponent = (function () {
                     }
                 }
 
-                if (!template) throw new Error(n + name + " should wrap it's template in one element");
                 if (!obj) throw new Error(n + jsName + " is not defined after loading component, did you forget to set the definition on the global scope? e.g. window['" + jsName + "'] = {}")
 
                 if (obj.require) {

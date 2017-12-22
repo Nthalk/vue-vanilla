@@ -3,7 +3,7 @@
     <script>if (!window.fetch) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></' + 'script>');</script>
     <script>if (!window.Promise) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></' + 'script>');</script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.11/vue.min.js"></script>
-    <script src="import-vue-component.js"></script>
+    <script src="import-vue-component.min.js"></script>
     <script>
         importVueComponent.location.basePath = '/vue-vanilla';
     </script>
@@ -268,6 +268,21 @@
 
                 </navigation-item>
 
+                <navigation-item title="Functional components">
+                    Lightweight functional components can be implemented like this
+                    <functional-component-example name="this"></functional-component-example>:
+                    <code-snippet code="
+                        <span>
+                            {\{props.name}} <-- Ignore the \
+                        </span>
+                        <script>
+                            window['functional-component-example'] = {
+                                functional: true
+                            }
+                        </script>
+                    "></code-snippet>
+                </navigation-item>
+
             </navigation-items>
         </div>
     </div>
@@ -278,6 +293,7 @@
     importVueComponent("navigation-items");
     importVueComponent("navigation-item");
     importVueComponent("code-snippet");
+    importVueComponent("functional-component-example");
     var app = new Vue({
         el: '.app',
         data: {
