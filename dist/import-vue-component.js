@@ -25,7 +25,7 @@ var importVueComponent = (function () {
     }
 
     function finalize(resolve, obj, template, name, jsName) {
-        if (obj.processTemplate) template = obj.processTemplate(template);
+        if (obj.transformTemplate) template = obj.transformTemplate(template);
         if (template) {
             if (obj.functional) {
                 var fn = Vue.compile(template);
@@ -78,14 +78,14 @@ var importVueComponent = (function () {
                 for (var i = 0; i < children.length; i++) {
                     var child = children[i];
                     if (child.tagName === 'STYLE') {
-                        d.head.appendChild(child);
+                        d.body.appendChild(ivc.transformStyle(child));
                     } else if (child.tagName === 'SCRIPT') {
-                        eval(child.innerText);
+                        eval(ivc.transformScript(child.innerText));
                         obj = w[jsName];
                         w[jsName] = promise;
                     } else if (child.outerHTML) {
                         if (template) throw new Error(n + name + " should wrap it's template in one element");
-                        template = child.outerHTML;
+                        template = ivc.transformTemplate(child.outerHTML);
                     }
                 }
 
@@ -152,6 +152,13 @@ var importVueComponent = (function () {
 
         return w[jsName];
     }
+
+    /**
+     *  Functions that can process elements/templates/scripts prior to loading them
+     */
+    ivc.transformScript = ivc.transformTemplate = ivc.transformStyle = function (style) {
+        return style;
+    };
 
     /**
      * Define how to resolve a location given a type
