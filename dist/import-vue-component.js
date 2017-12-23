@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.0.4-SNAPSHOT
+// Version: 1.1.0-SNAPSHOT
 var importVueComponent = (function () {
     var n = "importVueComponent ";
     var e;
@@ -55,7 +55,10 @@ var importVueComponent = (function () {
         }
 
         // We may have already loaded this
-        if (w[jsName]) return w[jsName];
+        if (w[jsName]) {
+            if (!lazy && w[jsName].constructor === Function && w[jsName]._lazy) w[jsName]();
+            return w[jsName];
+        }
 
         var resolve, reject;
         var promise = new Promise(function (_resolve, _reject) {
@@ -137,6 +140,7 @@ var importVueComponent = (function () {
         }
 
         if (!lazy) retrieve();
+        else retrieve._lazy = true;
 
         Vue.component(name, w[jsName] = function (resolve) {
             if (lazy) retrieve();
@@ -145,6 +149,7 @@ var importVueComponent = (function () {
                 if (--a === 0) r();
             });
         });
+
         return w[jsName];
     }
 
@@ -158,8 +163,8 @@ var importVueComponent = (function () {
         if (L.prefixes[type]) location = L.prefixes[type] + location;
         if (L.suffixes[type]) location = location + L.suffixes[type];
         if (location.indexOf("$basePath") === 0) {
-            if (!L.basePath) throw new Error(n + " basePath is not set, Cannot determine components root");
-            location = L.basePath + location.substr("$basePath".length);
+            var b = L.basePath;
+            return b + location.substr((b[b.length - 1] === '/' && location[9] === '/') ? 10 : 9);
         }
         return location;
     };
@@ -171,7 +176,8 @@ var importVueComponent = (function () {
     L.suffixes = {
         vue: ".vue.html"
     };
-    L.basePath = "";
+
+    L.basePath = document.location.pathname;
 
     ivc.lazy = true;
 
