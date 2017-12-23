@@ -25,13 +25,24 @@ var importVueComponent = (function () {
     }
 
     function finalize(resolve, obj, template, name, jsName) {
-        if (obj.transformTemplate) template = obj.transformTemplate(template);
         if (template) {
+            if (obj.transformTemplate) template = obj.transformTemplate(template);
             if (obj.functional) {
                 var fn = Vue.compile(template);
-                obj.render = function (instance, ctx) {
+                obj.render = function (h, ctx) {
+                    if (!ctx.$options) {
+                        ctx.$options = {};
+                        var cache = {};
+                        ctx._m = function (idx) {
+                            if (!cache[idx]) {
+                                cache[idx] = fn.staticRenderFns[idx].call(ctx);
+                                cache[idx].isStatic = true;
+                            }
+                            return cache[idx];
+                        }
+                    }
                     return fn.render.call(ctx);
-                }
+                };
             } else {
                 obj.template = template;
             }
@@ -145,7 +156,7 @@ var importVueComponent = (function () {
         Vue.component(name, w[jsName] = function (resolve) {
             if (lazy) retrieve();
             if (++a === 1) r();
-            promise.then(resolve).then(function () {
+            promise.then(resolve).then(function (c) {
                 if (--a === 0) r();
             });
         });
@@ -156,8 +167,8 @@ var importVueComponent = (function () {
     /**
      *  Functions that can process elements/templates/scripts prior to loading them
      */
-    ivc.transformScript = ivc.transformTemplate = ivc.transformStyle = function (style) {
-        return style;
+    ivc.transformScript = ivc.transformTemplate = ivc.transformStyle = function (o) {
+        return o;
     };
 
     /**
@@ -197,7 +208,6 @@ var importVueComponent = (function () {
             cb();
             return;
         }
-        var a;
         l.push(a = function (loaded) {
             if (!loaded) return;
             cb();
