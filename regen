@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 VERSION=$(cat pom.xml | grep '<version' | cut -d'>' -f2 | cut -d'<' -f1 | head -n1)
-
 gsed --in-place 's/Version:.*/Version: '${VERSION}'/' dist/import-vue-component.js
 rm -rf dist/import-vue-component.min.js*
 uglifyjs dist/import-vue-component.js \
@@ -9,3 +8,7 @@ uglifyjs dist/import-vue-component.js \
     --source-map "url='import-vue-component.min.js.map'" \
     --comments "/MIT|Version/" \
     -o dist/import-vue-component.min.js
+
+if [ "$1" == "commit" ]; then
+    git commit dist -m "Regen min/map"
+fi
