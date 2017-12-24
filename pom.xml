@@ -61,6 +61,8 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <autoDropAfterRelease>true</autoDropAfterRelease>
+                    <detectBuildFailures>true</detectBuildFailures>
                 </configuration>
             </plugin>
             <plugin>
