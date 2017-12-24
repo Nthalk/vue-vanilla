@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.0.4-SNAPSHOT
+// Version: 1.1.0-SNAPSHOT
 var importVueComponent = (function () {
     var n = "importVueComponent ";
     var e;
@@ -25,13 +25,24 @@ var importVueComponent = (function () {
     }
 
     function finalize(resolve, obj, template, name, jsName) {
-        if (obj.processTemplate) template = obj.processTemplate(template);
         if (template) {
+            if (obj.transformTemplate) template = obj.transformTemplate(template);
             if (obj.functional) {
                 var fn = Vue.compile(template);
-                obj.render = function (instance, ctx) {
+                obj.render = function (h, ctx) {
+                    if (!ctx.$options) {
+                        ctx.$options = {};
+                        var cache = {};
+                        ctx._m = function (idx) {
+                            if (!cache[idx]) {
+                                cache[idx] = fn.staticRenderFns[idx].call(ctx);
+                                cache[idx].isStatic = true;
+                            }
+                            return cache[idx];
+                        }
+                    }
                     return fn.render.call(ctx);
-                }
+                };
             } else {
                 obj.template = template;
             }
@@ -55,7 +66,10 @@ var importVueComponent = (function () {
         }
 
         // We may have already loaded this
-        if (w[jsName]) return w[jsName];
+        if (w[jsName]) {
+            if (!lazy && w[jsName].constructor === Function && w[jsName]._lazy) w[jsName]();
+            return w[jsName];
+        }
 
         var resolve, reject;
         var promise = new Promise(function (_resolve, _reject) {
@@ -75,14 +89,14 @@ var importVueComponent = (function () {
                 for (var i = 0; i < children.length; i++) {
                     var child = children[i];
                     if (child.tagName === 'STYLE') {
-                        d.head.appendChild(child);
+                        d.body.appendChild(ivc.transformStyle(child));
                     } else if (child.tagName === 'SCRIPT') {
-                        eval(child.innerText);
+                        eval(ivc.transformScript(child.innerText));
                         obj = w[jsName];
                         w[jsName] = promise;
                     } else if (child.outerHTML) {
                         if (template) throw new Error(n + name + " should wrap it's template in one element");
-                        template = child.outerHTML;
+                        template = ivc.transformTemplate(child.outerHTML);
                     }
                 }
 
@@ -137,16 +151,25 @@ var importVueComponent = (function () {
         }
 
         if (!lazy) retrieve();
+        else retrieve._lazy = true;
 
         Vue.component(name, w[jsName] = function (resolve) {
             if (lazy) retrieve();
             if (++a === 1) r();
-            promise.then(resolve).then(function () {
+            promise.then(resolve).then(function (c) {
                 if (--a === 0) r();
             });
         });
+
         return w[jsName];
     }
+
+    /**
+     *  Functions that can process elements/templates/scripts prior to loading them
+     */
+    ivc.transformScript = ivc.transformTemplate = ivc.transformStyle = function (o) {
+        return o;
+    };
 
     /**
      * Define how to resolve a location given a type
@@ -158,8 +181,8 @@ var importVueComponent = (function () {
         if (L.prefixes[type]) location = L.prefixes[type] + location;
         if (L.suffixes[type]) location = location + L.suffixes[type];
         if (location.indexOf("$basePath") === 0) {
-            if (!L.basePath) throw new Error(n + " basePath is not set, Cannot determine components root");
-            location = L.basePath + location.substr("$basePath".length);
+            var b = L.basePath;
+            return b + location.substr((b[b.length - 1] === '/' && location[9] === '/') ? 10 : 9);
         }
         return location;
     };
@@ -171,7 +194,8 @@ var importVueComponent = (function () {
     L.suffixes = {
         vue: ".vue.html"
     };
-    L.basePath = "";
+
+    L.basePath = document.location.pathname;
 
     ivc.lazy = true;
 
@@ -184,7 +208,6 @@ var importVueComponent = (function () {
             cb();
             return;
         }
-        var a;
         l.push(a = function (loaded) {
             if (!loaded) return;
             cb();
