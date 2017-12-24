@@ -3,7 +3,6 @@
 VERSION=$(cat pom.xml | grep '<version' | cut -d'>' -f2 | cut -d'<' -f1 | head -n1)
 
 gsed --in-place 's/Version:.*/Version: '${VERSION}'/' dist/import-vue-component.js
-
 rm -rf dist/import-vue-component.min.js*
 uglifyjs dist/import-vue-component.js \
     --mangle \
