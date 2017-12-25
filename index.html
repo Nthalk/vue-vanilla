@@ -73,7 +73,7 @@
             font-family: monospace;
         }
 
-        @media (min-width: 480px) {
+        @media (max-device-width: 480px) {
             .content {
                 left: 0;
             }
@@ -109,6 +109,21 @@
         </div>
         <nav-bar></nav-bar>
         <div class="content">
+            <navigation-item title="About"
+                             :depth="0"
+                             subtitle="Mission statement">
+                <p>
+                    Vue-Vanilla is a vue-loader full featured library that allows single file components without
+                    additional tools.
+                </p>
+                <h4>Features</h4>
+                <ul>
+                    <li>Lazy (or eager) loading</li>
+                    <li>Functional components</li>
+                    <li>Require dependent JS or CSS</li>
+                    <li>Custom template/script/css transformers that allow CSS vars</li>
+                </ul>
+            </navigation-item>
             <navigation-item title="Usage"
                              :depth="0"
                              subtitle="Getting setup & started">
