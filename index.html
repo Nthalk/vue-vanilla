@@ -1,5 +1,11 @@
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+
     <title>Vue Vanilla Loader</title>
 
     <script>if (!window.fetch) document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></' + 'script>');</script>
@@ -312,9 +318,8 @@
             <navigation-item title="Functional components"
                              subtitle="Lighter weight and faster"
                              :depth="1">
-                Lightweight functional components can be implemented like this
-                <functional-component-example name="this"></functional-component-example>
-                :
+                Lightweight functional components can be implemented like:
+                <functional-component-example name="this">component here</functional-component-example>
                 <code-snippet code="
                         <span>
                             {\{props.name}} <-- Ignore the \
