@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.1.2
+// Version: 1.1.3
 var importVueComponent = (function () {
     var n = "importVueComponent ";
     var e;
@@ -40,6 +40,10 @@ var importVueComponent = (function () {
                             }
                             return cache[idx];
                         }
+                    }
+                    if (!ctx.$scopedSlots) {
+                        ctx.$scopedSlots = {};
+                        ctx.$slots = ctx.slots();
                     }
                     return fn.render.call(ctx);
                 };
