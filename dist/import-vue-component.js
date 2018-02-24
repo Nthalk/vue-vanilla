@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.1.3
+// Version: 1.1.4-SNAPSHOT
 var importVueComponent = (function () {
     var n = "importVueComponent ";
     var e;
@@ -82,7 +82,8 @@ var importVueComponent = (function () {
         });
 
         function retrieve() {
-            fetch(ivc.location(location, "vue")).then(function (rsp) {
+            var resolvedLocation = ivc.location(location, "vue");
+            fetch(resolvedLocation).then(function (rsp) {
                 return rsp.text();
             }).then(function (content) {
                 var div = d.createElement('div');
@@ -95,16 +96,16 @@ var importVueComponent = (function () {
                     if (child.tagName === 'STYLE') {
                         d.body.appendChild(ivc.transformStyle(child));
                     } else if (child.tagName === 'SCRIPT') {
-                        eval(ivc.transformScript(child.innerText));
+                        eval(ivc.transformScript(child.textContent || child.innerText));
                         obj = w[jsName];
                         w[jsName] = promise;
                     } else if (child.outerHTML) {
-                        if (template) throw new Error(n + name + " should wrap it's template in one element");
+                        if (template) throw new Error(n + name + " should wrap it's template in one element (" + resolvedLocation + ")");
                         template = ivc.transformTemplate(child.outerHTML);
                     }
                 }
 
-                if (!obj) throw new Error(n + jsName + " is not defined after loading component, did you forget to set the definition on the global scope? e.g. window['" + jsName + "'] = {}")
+                if (!obj) throw new Error(n + jsName + " is not defined after loading component, did you forget to set the definition on the global scope? e.g. window['" + jsName + "'] = {} in (" + resolvedLocation + ")");
 
                 if (obj.require) {
                     var promises = [];
@@ -212,11 +213,12 @@ var importVueComponent = (function () {
             cb();
             return;
         }
-        l.push(a = function (loaded) {
+        var fn = function (loaded) {
             if (!loaded) return;
             cb();
-            l.splice(l.indexOf(a), 1);
-        })
+            l.splice(l.indexOf(fn), 1);
+        };
+        l.push(fn);
     };
 
     return ivc;
