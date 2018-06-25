@@ -70,7 +70,7 @@ var importVueComponent = (function () {
         }
 
         // We may have already loaded this
-        if (w[jsName]) {
+        if (w[jsName] && w[jsName].constructor !== HTMLElement) {
             if (!lazy && w[jsName].constructor === Function && w[jsName]._lazy) w[jsName]();
             return w[jsName];
         }
