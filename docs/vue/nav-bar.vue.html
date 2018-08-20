@@ -1,0 +1,41 @@
+<style>
+    .nav-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        background: #41b883;
+        font-size: 18px;
+        padding: 10px;
+        line-height: 24px;
+        border-bottom: 1px solid #35495F;
+        box-shadow: 0 5px 10px #35495F;
+        font-family: sans-serif;
+    }
+
+    .nav-bar_logo {
+        font-weight: bolder;
+    }
+
+    .nav-bar_menu {
+        border: 1px solid #349369;
+        box-shadow: 1px 1px 1px #349369;
+        background: #47c98f;
+        border-radius: 5px;
+        padding: 2px 5px;
+        cursor: pointer;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .nav-bar_menu:hover {
+        background: #349369;
+    }
+</style>
+<div class="nav-bar">
+    <span class="nav-bar_logo">Vue Vanilla</span>
+</div>
+<script>
+    window['nav-bar'] = {}
+</script>

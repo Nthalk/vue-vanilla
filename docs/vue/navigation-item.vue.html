@@ -1,0 +1,41 @@
+<style>
+    .navigation-item {
+        padding-top: 20px;
+    }
+
+    .navigation-item small {
+        color: #606060;
+        margin-left: 5px;
+    }
+</style>
+<div class="navigation-item" :id="title">
+    <h1 :style="{fontSize: 32 - (depth  * 6)}">
+        {{title}}
+        <small v-if="subtitle"> - {{subtitle}}</small>
+    </h1>
+    <hr/>
+    <slot></slot>
+</div>
+<script>
+    window['navigation-item'] = {
+        props: {
+            depth: {
+                type: Number,
+                required: true
+            },
+            title: {
+                type: String,
+                required: true
+            },
+            subtitle: {
+                type: String
+            }
+        },
+        mounted: function () {
+            this.$parent.$emit("nav-item-mounted", this);
+        },
+        beforeDestroy: function () {
+            this.$parent.$emit("nav-item-destroyed", this);
+        }
+    }
+</script>

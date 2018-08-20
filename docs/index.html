@@ -1,0 +1,472 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Vue Vanilla Loader</title>
+
+    <script>if (!window.fetch) {
+      document.writeln(
+          '<script src="//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js"></'
+          + 'script>');
+    }</script>
+    <script>if (!window.Promise) {
+      document.writeln(
+          '<script src="//cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></'
+          + 'script>');
+    }</script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.js"></script>
+    <script src="dist/import-vue-component.min.js"></script>
+
+    <style>
+        .app {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .side-menu {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            width: 300px;
+            bottom: 0;
+            background: #b1e2d0;
+        }
+
+        .side-menu_item {
+            padding: 5px;
+        }
+
+        .side-menu_item a {
+            text-decoration: none;
+        }
+
+        .side-menu_search {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .content {
+            padding: 10px;
+            overflow: auto;
+            position: absolute;
+            top: 45px;
+            left: 300px;
+            bottom: 0;
+            right: 0;
+            padding-bottom: 300px;
+        }
+
+        .download-button {
+            background: #77bce2;
+            border-radius: 100px;
+            padding: 20px 40px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.45em;
+            display: inline-block;
+            margin: 15px;
+        }
+
+        .code {
+            background: #e2e2e2;
+            font-family: monospace;
+        }
+
+        @media (max-device-width: 480px) {
+            .content {
+                left: 0;
+            }
+
+            .side-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <a href="https://github.com/nthalk/vue-vanilla"><img
+        style="position: fixed; top: 0; right: 0; border: 0; z-index:10"
+        src="//camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67"
+        alt="Fork me on GitHub"
+        data-canonical-src="//s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <loading-screen v-if="importerIsLoading"></loading-screen>
+    <template v-else>
+        <div class="side-menu">
+            <div style="margin:15px;">
+                <input type="search" class="side-menu_search" v-model="search"/>
+            </div>
+            <div v-for="item in navSearchItems"
+                 class="side-menu_item"
+                 :style="{
+                    fontSize: 18 - (item.depth*3),
+                    marginLeft: 10 * item.depth
+                 }">
+                <a :href="'#' +item.title">{{item.title}}</a>
+            </div>
+        </div>
+        <nav-bar></nav-bar>
+        <div class="content">
+            <navigation-item title="About"
+                             :depth="0"
+                             subtitle="Mission statement">
+                <p>
+                    Vue-Vanilla is a vue-loader full featured library that allows single file
+                    components
+                    without
+                    additional tools.
+                </p>
+                <h4>Features</h4>
+                <ul>
+                    <li>Lazy (or eager) loading</li>
+                    <li>Functional components</li>
+                    <li>Require dependent JS or CSS</li>
+                    <li>Custom template/script/css transformers that allow CSS vars</li>
+                </ul>
+            </navigation-item>
+            <navigation-item title="Usage"
+                             :depth="0"
+                             subtitle="Getting setup & started">
+                <p>
+                    Using Vue Vanilla is simple. There is no requirejs, amd, commonjs requirement.
+                    No babbel,
+                    webpack, webpack2, browserify, or nodejs. It's just vanilla JavaScript.
+                </p>
+                <p>Download the library, load it via a script tag, and get going!</p>
+                <code-snippet code="
+                        <div class='app'>
+                            <loading-screen></loading-screen>
+                            <input @click='showLoader'/>
+                        </div>
+                        <script>
+                            // HERE COMES THE SAUCE!
+                            importVueComponent('loading-screen'); // <-- tasty
+                            var app = new Vue({
+                                el: '.app',
+                                data: {
+                                    shouldShowLoader: false
+                                },
+                                methods: {
+                                    showLoader: function(){
+                                        this.shouldShowLoader = true;
+                                        setTimeout(function(){
+                                            this.shouldShowLoader = false;
+                                        }.bind(this), 1000);
+                                    }
+                                }
+                            });
+                        </script>
+                    "></code-snippet>
+            </navigation-item>
+            <navigation-item title="Download"
+                             subtitle="Get the goods"
+                             :depth="1">
+                <p>
+                    This library currently is not served on any CDN's (see
+                    https://github.com/cdnjs/cdnjs/blob/master/CONTRIBUTING.md#b-request-a-new-library)
+                    But that won't stop you from downloading the library and dropping it into your
+                    project!
+                </p>
+                <div style="text-align:center">
+                    <a class="download-button" href="dist/import-vue-component.js">import-vue-component.js</a>
+                    <a class="download-button" href="dist/import-vue-component.min.js">import-vue-component.min.js</a>
+                    <a class="download-button" href="dist/import-vue-component.min.js.map">import-vue-component.min.js.map</a>
+                </div>
+            </navigation-item>
+            <navigation-item title="Polyfill Requirements"
+                             subtitle="Dealing with bad browsers"
+                             :depth="1">
+                <p>
+                    It is required to have a browser or polyfill for the Promises and fetch apis.
+                    As far as browser compatibilities go, ie9+ requires the fetch and promise
+                    polyfill:
+                </p>
+                <code-snippet code="
+                        <script>
+                            if (!window.fetch) document.writeln(
+                                '<script src=\'//cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js\'></' +
+                                'script>');
+                        </script>
+                        <script>
+                            if (!window.Promise) document.writeln(
+                                '<script src='//cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js'></' +
+                                'script>');
+                        </script>
+                    "></code-snippet>
+            </navigation-item>
+
+            <navigation-item title="Configuration and locations"
+                             :depth="1">
+                <p>
+                    By default, all resources are split up into two categories:
+                    <span class="code">lib</span> and <span class="code">vue</span>.
+                </p>
+                <p>
+                    Vue resources come from <span
+                    class="code">$basePath/vue/component-name.vue.html</span>.
+                </p>
+                <p>
+                    Lib resources come from <span class="code">$basePath/vendor/library-path</span>.
+                </p>
+                <code-snippet code="
+                        // BasePath
+                        // Default: window.location.pathname
+                        importVueComponent.location.basePath = '/some-other/context-path';
+
+                        // Vue Component prefix
+                        // Default: '$basePath/vue/'
+                        importVueComponent.location.prefixes['vue'] = 'some/other/vue/prefix';
+                        importVueComponent.location.suffixes['vue'] = '.vue';
+
+                        // Lib prefixes
+                        // Default: '$basePath/vendor/'
+                        importVueComponent.location.prefixes['lib'] = 'some/other/lib/prefix';
+
+                        // Statically defined path overrides
+                        // Default: empty
+                        importVueComponent.location.overrides['jQuery'] = 'some/path/to/jquery.js';
+                    "></code-snippet>
+                <p>
+                    However, you can specify other locations for your component if you want to be
+                    more
+                    organized
+                    or if your component has a conflicting js object name:
+                </p>
+                <code-snippet code="
+                        // By argument
+                        importVueComponent('my-component', 'some-location/my-component.vue', 'resolveAsGlobalJsName');
+
+                        // Or options
+                        importVueComponent('my-component', {
+                            location: 'some-location/my-component.vue',
+                            jsName: 'resolveAsGlobalJsName',
+                            lazy: false
+                        });
+                    "></code-snippet>
+            </navigation-item>
+
+
+            <navigation-item title="Component Definitions"
+                             :depth="0">
+                <code-snippet code="
+                        <!--
+                            component's location: /vue/my-component.vue.html
+                            importing it in a vue app: importVueComponent('my-component');
+                        -->
+                        <style>
+                            .my-component{
+                                background: blue;
+                            }
+                        </style>
+                        <div class='my-component'>
+                            My content/template
+                        </div>
+                        <script>
+                            window['my-component'] = {/* normal Vue component definition */}
+                        </script>
+                    "></code-snippet>
+                <p>
+                    Designing components is intended to be easy. All that's needed is a file with a
+                    script and
+                    a
+                    template.
+                </p>
+                <p>
+                    The script must define a window-level javascript name of the component.
+                </p>
+            </navigation-item>
+
+            <navigation-item title="JS/CSS Requirements"
+                             :depth="1">
+                <code-snippet code="
+                        ...
+                        <script>
+                            window['my-component'] = {
+                                require: {
+                                    'jQuery': '//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+                                    'bootstrap_css': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'
+                                },
+                                /* then: {... normal Vue component definition ...} */
+                                then: function(){
+                                    return {/* normal Vue component definition */};
+                                }
+                            }
+                        </script>
+                    "></code-snippet>
+                <p>
+                    Sometimes, when you load a component, you need to be sure that you have all of
+                    the
+                    required
+                    libraries
+                    and css scripts loaded.
+                </p>
+                <p>
+                    By wrapping your component definition in an object with a require and then
+                    property, your
+                    component
+                    will try to load the scripts and styles first.
+                </p>
+                <p>
+                    Styles will not be loaded by the importer twice.
+                </p>
+                <p>
+                    If the key of the script, 'jQuery' in this case, is present, then it will not
+                    attempt to
+                    load
+                    it.
+                </p>
+                <p>
+                    If you are worried about version conflicts, then this library's opinion is that
+                    you are
+                    already
+                    dealing with too much dependency sprawl and should reduce your JavaScript usage.
+                </p>
+            </navigation-item>
+            <navigation-item title="Functional components"
+                             subtitle="Lighter weight and faster"
+                             :depth="1">
+                Lightweight functional components can be implemented like:
+                <functional-component-example name="this">component here
+                </functional-component-example>
+                <code-snippet code="
+                        <span>
+                            {\{props.name}} <-- Ignore the \
+                        </span>
+                        <script>
+                            window['functional-component-example'] = {
+                                functional: true
+                            }
+                        </script>
+                    "></code-snippet>
+            </navigation-item>
+
+
+            <navigation-item title="Loading, Loading screens, and lazyness"
+                             :depth="0">
+                <p>
+                    Often, you want to show a loading screen while the components are being remotely
+                    loaded.
+                    To do this, you can add a listener to the importVueComponent:
+                </p>
+                <code-snippet code="
+                        var app = new Vue({
+                            el: '.app',
+                            data: {
+                                importerIsLoading: true
+                            },
+                            mounted: function () {
+                                importVueComponent.track(function (isLoading) {
+                                    this.importerIsLoading = isLoading
+                                }.bind(this));
+                            }
+                        });
+                    "></code-snippet>
+                <p>
+                    Whenever the importVueComponent registers a component, it immediately tries to
+                    load it.
+                    This can be undesirable for large projects, or large routed applications, as it
+                    unnecessarily
+                    grabs resources and takes time. To turn this off, you can set the
+                    importVueComponent.lazy
+                    flag
+                    to false:
+                </p>
+                <code-snippet code="
+                        importVueComponent.lazy = true; // default is false
+                    "></code-snippet>
+                <p>
+                    However, when doing so, it is recommended to track the loading state of the
+                    importer
+                    to tell when child components might be ready:
+                </p>
+                <code-snippet code="
+                        importVueComponent.onceLoaded(function(){
+                            // this will be run once importVueComponent is finished loading it's current set
+                            // $nextTick will fire after all child components have been mounted
+                        });
+                    "></code-snippet>
+
+                <p>
+                    When using importVueComponent, you can specify to load some things lazily, the
+                    stub in
+                    place
+                    will
+                    either be the Component (when it's loaded) or a callback function:
+                </p>
+
+                <code-snippet code="
+                        new VueRouter({
+                          routes: [
+                            { path: '/user/:id', component: importVueComponent('user', {lazy: true})}
+                          ]
+                        })
+                    "></code-snippet>
+
+            </navigation-item>
+        </div>
+    </template>
+</div>
+<script>
+  importVueComponent("loading-screen");
+  importVueComponent("navigation-item");
+  importVueComponent("code-snippet");
+  importVueComponent("functional-component-example");
+  importVueComponent("nav-bar");
+
+  var oldhash = window.location.hash;
+  window.location.hash = '';
+
+  var app = new Vue({
+    el: '.app',
+    data: {
+      importerIsLoading: true,
+      navItems: [],
+      search: ''
+    },
+    computed: {
+      navSearchItems: function () {
+        if (!this.search) return this.navItems;
+        var items = [];
+        for (var i = 0; i < this.navItems.length; i++) {
+          var item = this.navItems[i];
+          if (item.$el.outerText.toLowerCase().indexOf(this.search.toLowerCase()) !== -1) {
+            items.push(item);
+          }
+        }
+        return items;
+      }
+    },
+    watch: {
+      navSearchItems: function () {
+        this.$nextTick(function () {
+          window.location.hash = oldhash;
+        });
+      }
+    },
+    mounted: function () {
+      importVueComponent.track(function (isLoading) {
+        this.importerIsLoading = isLoading;
+        // recalculate hashes
+
+      }.bind(this));
+      this.$on("nav-item-mounted", function (item) {
+        this.navItems.push(item);
+      })
+    }
+  });
+</script>
+</body>
+</html>

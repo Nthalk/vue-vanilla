@@ -9,6 +9,9 @@ uglifyjs dist/import-vue-component.js \
     --comments "/MIT|Version/" \
     -o dist/import-vue-component.min.js
 
+rm -rf docs/dist
+cp -r dist docs/dist
+
 if [ "$1" == "commit" ]; then
     git commit dist -m "Regen min/map"
 fi
