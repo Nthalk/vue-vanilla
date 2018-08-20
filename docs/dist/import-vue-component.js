@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.1.6-SNAPSHOT
+// Version: 1.1.7-SNAPSHOT
 var importVueComponent = (function () {
   var n = "importVueComponent ";
   var e;
