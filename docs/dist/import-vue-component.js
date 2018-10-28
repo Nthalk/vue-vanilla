@@ -226,7 +226,7 @@ var importVueComponent = (function () {
           n + "could not load:" + type + " resource at " + location);
     }
     if (L.overrides[location]) {
-      return r.overrides[location];
+      return L.overrides[location];
     }
     if (location.indexOf("//") === 0 ||
         location.indexOf("http") === 0) {
