@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.1.7
+// Version: 1.1.8-SNAPSHOT
 var importVueComponent = (function () {
   var n = "importVueComponent ";
   var e;
@@ -30,7 +30,7 @@ var importVueComponent = (function () {
 
   function r() {
     for (var i = 0; i < l.length; i++) {
-      l[i](a === 1);
+      l[i](a === 0);
     }
   }
 
