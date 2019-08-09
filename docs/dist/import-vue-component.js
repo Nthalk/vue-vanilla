@@ -1,5 +1,5 @@
 // MIT License Copyright (c) 2017 Carl Taylor,
-// Version: 1.1.8-SNAPSHOT
+// Version: 1.1.9-SNAPSHOT
 var importVueComponent = (function () {
   var n = "importVueComponent ";
   var e;
@@ -29,8 +29,13 @@ var importVueComponent = (function () {
   var p = {};
 
   function r() {
-    for (var i = 0; i < l.length; i++) {
-      l[i](a === 0);
+    // Callbacks can remove themselves and skip other callbacks
+    var lc = [].concat(l);
+    for (var i = 0; i < lc.length; i++) {
+      // In case the callback was removed, we should check again if it is relevant
+      if (l.indexOf(lc[i]) !== -1) {
+        lc[i](a === 0);
+      }
     }
   }
 
